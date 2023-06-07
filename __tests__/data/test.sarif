@@ -1,0 +1,39 @@
+{
+    "runs": [
+      {
+        "results": [
+          {
+            "locations": [
+              {
+                "ruleId": "dotnet-resource-leak",
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "__tests__/data/test.cs"
+                  }
+                }
+              },
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "__tests__/data/test2.cs"
+                  }
+                }
+              }
+            ]
+          }, 
+          {
+            "ruleId": "hardcoded-credentials",
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "__tests__/data/test3.cs"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+}

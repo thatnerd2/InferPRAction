@@ -1,0 +1,13 @@
+name: 'Infer# PR'
+description: 'SARIF -> Fixes and PR Comments'
+author: 'DeepPrompt Team'
+inputs:
+  sarif: # change this
+    required: true
+    description: 'Path to SARIF file'
+outputs:
+  updated_sarif:
+    description: 'Path to updated SARIF file'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
