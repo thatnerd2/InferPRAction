@@ -28,9 +28,8 @@ function scanSourceFiles(sarif) {
         for (const result of run['results']) {
             for (const location of result['locations']) {
                 const uri = location.physicalLocation.artifactLocation.uri;
-                const contents = fs_1.default
-                    .readFileSync(location.physicalLocation.artifactLocation.uri)
-                    .toString();
+                console.log(`URI: ${uri}`);
+                const contents = fs_1.default.readFileSync(uri.replace('file:', '')).toString();
                 sourceFilesMap[uri] = contents;
             }
         }
@@ -151,6 +150,7 @@ function run() {
             const github_token = core.getInput('github_token');
             const sarif_path = core.getInput('sarif_path');
             const sarif = JSON.parse(fs_1.default.readFileSync(sarif_path, 'utf8'));
+            console.log('SARIF read successfully');
             const sourceFilesMap = (0, client_1.scanSourceFiles)(sarif);
             const result = yield (0, client_1.mockUpdateSarifWithFixes)(sarif, sourceFilesMap);
             // do PR comments
@@ -254,7 +254,8 @@ function writePRReview(sarif, github_token) {
                     continue;
                 }
                 const reviewComment = {
-                    path: uri,
+                    // Sometimes the path is an absolute path in the form /home/.../repo/repo/file, so we need to split by repo name and take the
+                    path: uri.split(`${repo}/`).slice(2).join(`${repo}/`),
                     body: commentText,
                     line: change_end_line,
                     side: 'RIGHT'
