@@ -203,6 +203,8 @@ function parsePatchesToValidRegions(patches) {
         .filter(line => line.startsWith('@@'))
         .map(line => line.split('@@')[1].split(' ')[2].split(','))
         .map(line => [Math.abs(parseInt(line[0])), Math.abs(parseInt(line[1]))]);
+    console.log(patches);
+    console.log(lines);
     const validRegions = paths.map((path, i) => ({
         path,
         start_line: lines[i][0],
@@ -225,12 +227,12 @@ function writePRReview(sarif, github_token) {
         const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
         const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
         const commit_id = event.after;
-        const pull_number = event.pull_request.number;
+        const pullNumber = event.pull_request.number;
         // get the pull request data
         const patchUrl = (yield octokit.pulls.get({
             owner,
             repo,
-            pull_number
+            pull_number: pullNumber
         })).data.patch_url;
         const patches = (yield octokit.request(patchUrl, {
             headers: {
@@ -277,7 +279,7 @@ function writePRReview(sarif, github_token) {
             const review = (yield octokit.pulls.createReview({
                 owner,
                 repo,
-                pull_number,
+                pull_number: pullNumber,
                 commit_id,
                 event: 'COMMENT',
                 body: 'Copilot Defender Preview\n\nPlease review the suggested changes.',

@@ -27,6 +27,8 @@ function parsePatchesToValidRegions(patches: string): ValidRegion[] {
     .filter(line => line.startsWith('@@'))
     .map(line => line.split('@@')[1].split(' ')[2].split(','))
     .map(line => [Math.abs(parseInt(line[0])), Math.abs(parseInt(line[1]))])
+  console.log(patches)
+  console.log(lines)
   const validRegions = paths.map((path, i) => ({
     path,
     start_line: lines[i][0],
