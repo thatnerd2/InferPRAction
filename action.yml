@@ -2,11 +2,11 @@ name: 'Infer# PR'
 description: 'SARIF -> Fixes and PR Comments'
 author: 'DeepPrompt Team'
 inputs:
-  sarif: # change this
+  sarif_path: # change this
     required: true
     description: 'Path to SARIF file'
 outputs:
-  updated_sarif:
+  updated_sarif_path:
     description: 'Path to updated SARIF file'
 runs:
   using: 'node16'

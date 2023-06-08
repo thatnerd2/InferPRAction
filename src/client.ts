@@ -26,6 +26,7 @@ export function scanSourceFiles(sarif: SarifFileContents): SourceFilesMap {
       }
     }
   }
+  console.log('Gathered source files:', Object.keys(sourceFilesMap))
   return sourceFilesMap
 }
 
@@ -67,8 +68,6 @@ export async function mockUpdateSarifWithFixes(
       const fix_end_line =
         result['locations'][0]['physicalLocation']['region']['endLine'] ||
         fix_start_line
-      console.log(file_contents)
-      console.log(fix_start_line, fix_end_line)
       result['fixes'] = [
         {
           description: {text: 'MESSAGE HERE'},

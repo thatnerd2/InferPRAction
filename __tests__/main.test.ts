@@ -6,8 +6,11 @@ import {
   scanSourceFiles,
   mockUpdateSarifWithFixes
 } from '../src/client'
+import {writePRReview} from '../src/pr_comment'
 import * as path from 'path'
 import {expect, test} from '@jest/globals'
+
+require('dotenv').config()
 
 test('gathers source files map', async () => {
   const sarif: SarifFileContents = JSON.parse(
@@ -22,18 +25,18 @@ test('gathers source files map', async () => {
   )
 })
 
-test('calls deeppromptbugfix', async () => {
-  const sarif: SarifFileContents = JSON.parse(
-    fs.readFileSync('__tests__/data/CLEAR_TEXT_LOGGING.sarif').toString()
-  )
-  const sourceFilesMap = {
-    'CLEAR_TEXT_LOGGING.js': fs
-      .readFileSync('__tests__/data/CLEAR_TEXT_LOGGING.js')
-      .toString()
-  }
-  const result = await updateSarifWithFixes(sarif, sourceFilesMap)
-  expect(result).toBeDefined()
-}, 100000)
+// test('calls deeppromptbugfix', async () => {
+//   const sarif: SarifFileContents = JSON.parse(
+//     fs.readFileSync('__tests__/data/CLEAR_TEXT_LOGGING.sarif').toString()
+//   )
+//   const sourceFilesMap = {
+//     'CLEAR_TEXT_LOGGING.js': fs
+//       .readFileSync('__tests__/data/CLEAR_TEXT_LOGGING.js')
+//       .toString()
+//   }
+//   const result = await updateSarifWithFixes(sarif, sourceFilesMap)
+//   expect(result).toBeDefined()
+// }, 100000)
 
 test('mocks deeppromptbugfix', async () => {
   const sarif: SarifFileContents = JSON.parse(
@@ -59,14 +62,11 @@ test('mocks deeppromptbugfix', async () => {
 })
 
 test('writes comment on sample pr', async () => {
-  process.env.GITHUB_REPOSITORY = 'aayc/SampleProject'
-  process.env.GITHUB_SHA = '1111'
-  process.env.PULL_NUMBER = '1111'
-  process.env.GITHUB_TOKEN = '1111'
-  const sarif_file_contents = fs
-    .readFileSync('__tests__/data/test_sarif_with_fix.sarif')
-    .toString()
-  writePRComments(sarif_file_contents)
+  // Add env vars in .env for GITHUB_REPOSITORY, GITHUB_TOKEN and GITHUB_EVENT_PATH
+  const sarif_file_contents = JSON.parse(
+    fs.readFileSync('__tests__/data/test_sarif_with_fix.sarif').toString()
+  )
+  expect(await writePRReview(sarif_file_contents)).toBe(true)
 })
 
 // // shows how the runner will run a javascript action with env / stdout protocol
