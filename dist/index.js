@@ -148,12 +148,13 @@ const pr_comment_1 = __nccwpck_require__(7347);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const github_token = core.getInput('github_token');
             const sarif_path = core.getInput('sarif_path');
             const sarif = JSON.parse(fs_1.default.readFileSync(sarif_path, 'utf8'));
             const sourceFilesMap = (0, client_1.scanSourceFiles)(sarif);
             const result = yield (0, client_1.mockUpdateSarifWithFixes)(sarif, sourceFilesMap);
             // do PR comments
-            (0, pr_comment_1.writePRReview)(result);
+            (0, pr_comment_1.writePRReview)(result, github_token);
             fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result.sarif));
             core.setOutput('updated_sarif', 'updated_sarif.json');
         }
@@ -208,18 +209,15 @@ function parsePatchesToValidRegions(patches) {
     console.log(validRegions);
     return validRegions;
 }
-function writePRReview(sarif) {
+function writePRReview(sarif, github_token) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!process.env.GITHUB_REPOSITORY ||
-            !process.env.GITHUB_EVENT_PATH ||
-            !process.env.GITHUB_TOKEN) {
-            console.log('Failed to get GITHUB_REPOSITORY, GITHUB_EVENT_PATH or GITHUB_TOKEN');
+        if (!process.env.GITHUB_REPOSITORY || !process.env.GITHUB_EVENT_PATH) {
+            console.log('Failed to get GITHUB_REPOSITORY, GITHUB_EVENT_PATH or github_token');
             console.log(process.env.GITHUB_REPOSITORY);
             console.log(process.env.GITHUB_EVENT_PATH);
-            console.log(process.env.GITHUB_TOKEN);
             return false;
         }
-        const octokit = new rest_1.Octokit({ auth: process.env.GITHUB_TOKEN });
+        const octokit = new rest_1.Octokit({ auth: github_token });
         const event = JSON.parse(fs_1.default.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
         const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
         const repo = process.env.GITHUB_REPOSITORY.split('/')[1];

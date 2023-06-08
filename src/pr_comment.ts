@@ -37,23 +37,19 @@ function parsePatchesToValidRegions(patches: string): ValidRegion[] {
 }
 
 export async function writePRReview(
-  sarif: SarifFileContents
+  sarif: SarifFileContents,
+  github_token: string
 ): Promise<boolean> {
-  if (
-    !process.env.GITHUB_REPOSITORY ||
-    !process.env.GITHUB_EVENT_PATH ||
-    !process.env.GITHUB_TOKEN
-  ) {
+  if (!process.env.GITHUB_REPOSITORY || !process.env.GITHUB_EVENT_PATH) {
     console.log(
-      'Failed to get GITHUB_REPOSITORY, GITHUB_EVENT_PATH or GITHUB_TOKEN'
+      'Failed to get GITHUB_REPOSITORY, GITHUB_EVENT_PATH or github_token'
     )
     console.log(process.env.GITHUB_REPOSITORY)
     console.log(process.env.GITHUB_EVENT_PATH)
-    console.log(process.env.GITHUB_TOKEN)
     return false
   }
 
-  const octokit = new Octokit({auth: process.env.GITHUB_TOKEN})
+  const octokit = new Octokit({auth: github_token})
   const event = JSON.parse(
     fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')
   )
