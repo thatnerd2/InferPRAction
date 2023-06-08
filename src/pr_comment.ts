@@ -1,6 +1,7 @@
 import {SarifFileContents} from './client'
 import {Octokit} from '@octokit/rest'
 import fs from 'fs'
+import {validateHeaderName} from 'http'
 
 type ReviewComment = {
   path: string
@@ -32,6 +33,7 @@ function parsePatchesToValidRegions(patches: string): ValidRegion[] {
     start_line: lines[i][0],
     end_line: lines[i][0] + lines[i][1] - 1
   }))
+  console.log('Valid Regions')
   console.log(validRegions)
   return validRegions
 }
@@ -78,8 +80,14 @@ export async function writePRReview(
   const reviewComments = []
   for (const run of sarif['runs']) {
     for (const result of run['results']) {
-      const uri =
-        result['locations'][0]['physicalLocation']['artifactLocation']['uri']
+      // Sometimes the path is an absolute path in the form /home/.../repo/repo/file, so we need to split by repo name and take the
+      const uri = result['locations'][0]['physicalLocation'][
+        'artifactLocation'
+      ]['uri']
+        .split(`${repo}/`)
+        .slice(2)
+        .join(`${repo}/`)
+
       if (!('fixes' in result)) {
         continue
       }
@@ -112,8 +120,7 @@ export async function writePRReview(
       }
 
       const reviewComment: ReviewComment = {
-        // Sometimes the path is an absolute path in the form /home/.../repo/repo/file, so we need to split by repo name and take the
-        path: uri.split(`${repo}/`).slice(2).join(`${repo}/`),
+        path: uri,
         body: commentText,
         line: change_end_line,
         side: 'RIGHT'
