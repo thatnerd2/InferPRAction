@@ -19,7 +19,9 @@ export function scanSourceFiles(sarif: SarifFileContents): SourceFilesMap {
     for (const result of run['results']) {
       for (const location of result['locations']) {
         const uri = location.physicalLocation.artifactLocation.uri
-        console.log(`URI: ${uri}`)
+        if (uri in sourceFilesMap) {
+          continue
+        }
         const contents = fs.readFileSync(uri.replace('file:', '')).toString()
         sourceFilesMap[uri] = contents
       }

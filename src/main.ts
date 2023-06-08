@@ -14,7 +14,7 @@ async function run(): Promise<void> {
 
     // do PR comments
     writePRReview(result, github_token)
-    fs.writeFileSync('updated_sarif.json', JSON.stringify(result.sarif))
+    fs.writeFileSync('updated_sarif.json', JSON.stringify(result))
     core.setOutput('updated_sarif', 'updated_sarif.json')
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
