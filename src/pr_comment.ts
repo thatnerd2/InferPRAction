@@ -57,14 +57,14 @@ export async function writePRReview(
   const owner = process.env.GITHUB_REPOSITORY.split('/')[0]
   const repo = process.env.GITHUB_REPOSITORY.split('/')[1]
   const commit_id = event.after
-  const pull_number = event.pull_request.number
+  const pullNumber = event.pull_request.number
 
   // get the pull request data
   const patchUrl = (
     await octokit.pulls.get({
       owner,
       repo,
-      pull_number
+      pull_number: pullNumber
     })
   ).data.patch_url
   const patches = (
@@ -138,7 +138,7 @@ export async function writePRReview(
       await octokit.pulls.createReview({
         owner,
         repo,
-        pull_number,
+        pull_number: pullNumber,
         commit_id,
         event: 'COMMENT',
         body: 'Copilot Defender Preview\n\nPlease review the suggested changes.',

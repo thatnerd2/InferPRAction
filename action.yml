@@ -1,6 +1,5 @@
 name: 'Infer# PR'
-description: 'SARIF -> Fixes and PR Comments'
-author: 'DeepPrompt Team'
+
 inputs:
   sarif_path: # change this
     required: true
