@@ -112,7 +112,8 @@ export async function writePRReview(
       }
 
       const reviewComment: ReviewComment = {
-        path: uri,
+        // Sometimes the path is an absolute path in the form /home/.../repo/repo/file, so we need to split by repo name and take the
+        path: uri.split(`${repo}/`).slice(2).join(`${repo}/`),
         body: commentText,
         line: change_end_line,
         side: 'RIGHT'
