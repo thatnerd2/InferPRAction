@@ -28,7 +28,9 @@ function scanSourceFiles(sarif) {
         for (const result of run['results']) {
             for (const location of result['locations']) {
                 const uri = location.physicalLocation.artifactLocation.uri;
-                console.log(`URI: ${uri}`);
+                if (uri in sourceFilesMap) {
+                    continue;
+                }
                 const contents = fs_1.default.readFileSync(uri.replace('file:', '')).toString();
                 sourceFilesMap[uri] = contents;
             }
@@ -155,7 +157,7 @@ function run() {
             const result = yield (0, client_1.mockUpdateSarifWithFixes)(sarif, sourceFilesMap);
             // do PR comments
             (0, pr_comment_1.writePRReview)(result, github_token);
-            fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result.sarif));
+            fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result));
             core.setOutput('updated_sarif', 'updated_sarif.json');
         }
         catch (error) {
