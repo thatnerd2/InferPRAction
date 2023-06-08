@@ -1,7 +1,6 @@
 import {SarifFileContents} from './client'
 import {Octokit} from '@octokit/rest'
 import fs from 'fs'
-import {validateHeaderName} from 'http'
 
 type ReviewComment = {
   path: string
@@ -81,12 +80,11 @@ export async function writePRReview(
   for (const run of sarif['runs']) {
     for (const result of run['results']) {
       // Sometimes the path is an absolute path in the form /home/.../repo/repo/file, so we need to split by repo name and take the
-      const uri = result['locations'][0]['physicalLocation'][
-        'artifactLocation'
-      ]['uri']
-        .split(`${repo}/`)
-        .slice(2)
-        .join(`${repo}/`)
+      const rawUri =
+        result['locations'][0]['physicalLocation']['artifactLocation']['uri']
+      const uri = rawUri.includes(`${repo}/${repo}/`)
+        ? rawUri.split(`${repo}/`).slice(2).join(`${repo}/`)
+        : rawUri
 
       if (!('fixes' in result)) {
         continue
@@ -116,6 +114,7 @@ export async function writePRReview(
         )
       ) {
         console.log(`Skipping comment because it's outside of the valid region`)
+        console.log(`${uri}:${change_start_line}-${change_end_line}`)
         continue
       }
 

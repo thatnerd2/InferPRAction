@@ -206,6 +206,7 @@ function parsePatchesToValidRegions(patches) {
         start_line: lines[i][0],
         end_line: lines[i][0] + lines[i][1] - 1
     }));
+    console.log('Valid Regions');
     console.log(validRegions);
     return validRegions;
 }
@@ -238,7 +239,11 @@ function writePRReview(sarif, github_token) {
         const reviewComments = [];
         for (const run of sarif['runs']) {
             for (const result of run['results']) {
-                const uri = result['locations'][0]['physicalLocation']['artifactLocation']['uri'];
+                // Sometimes the path is an absolute path in the form /home/.../repo/repo/file, so we need to split by repo name and take the
+                const rawUri = result['locations'][0]['physicalLocation']['artifactLocation']['uri'];
+                const uri = rawUri.includes(`${repo}/${repo}/`)
+                    ? rawUri.split(`${repo}/`).slice(2).join(`${repo}/`)
+                    : rawUri;
                 if (!('fixes' in result)) {
                     continue;
                 }
@@ -251,11 +256,11 @@ function writePRReview(sarif, github_token) {
                     region.start_line <= change_start_line &&
                     region.end_line >= change_end_line)) {
                     console.log(`Skipping comment because it's outside of the valid region`);
+                    console.log(`${uri}:${change_start_line}-${change_end_line}`);
                     continue;
                 }
                 const reviewComment = {
-                    // Sometimes the path is an absolute path in the form /home/.../repo/repo/file, so we need to split by repo name and take the
-                    path: uri.split(`${repo}/`).slice(2).join(`${repo}/`),
+                    path: uri,
                     body: commentText,
                     line: change_end_line,
                     side: 'RIGHT'
