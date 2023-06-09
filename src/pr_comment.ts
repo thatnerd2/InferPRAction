@@ -49,23 +49,19 @@ function parsePatchesToValidRegions(patches: string): ValidRegion[] {
 }
 
 export async function writePRReview(
-  sarif: SarifFileContents
+  sarif: SarifFileContents,
+  CPD_GITHUB_TOKEN: string
 ): Promise<boolean> {
-  if (
-    !process.env.CPD_GITHUB_TOKEN ||
-    !process.env.GITHUB_REPOSITORY ||
-    !process.env.GITHUB_EVENT_PATH
-  ) {
+  if (!process.env.GITHUB_REPOSITORY || !process.env.GITHUB_EVENT_PATH) {
     console.log(
       'Failed to get CPD_GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_PATH'
     )
     console.log(process.env.GITHUB_REPOSITORY)
     console.log(process.env.GITHUB_EVENT_PATH)
-    console.log(process.env.CPD_GITHUB_TOKEN)
     return false
   }
 
-  const octokit = new Octokit({auth: process.env.CPD_GITHUB_TOKEN})
+  const octokit = new Octokit({auth: CPD_GITHUB_TOKEN})
   const event = JSON.parse(
     fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')
   )

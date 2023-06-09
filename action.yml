@@ -4,6 +4,12 @@ inputs:
   sarif_path: # change this
     required: true
     description: 'Path to SARIF file'
+  CPD_GITHUB_TOKEN:
+    required: true
+    description: 'cpd github token'
+  DPBF_TOKEN:
+    required: true
+    description: 'dpbf token'
 outputs:
   updated_sarif_path:
     description: 'Path to updated SARIF file'

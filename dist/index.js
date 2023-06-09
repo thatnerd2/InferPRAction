@@ -149,15 +149,18 @@ const pr_comment_1 = __nccwpck_require__(7347);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const CPD_GITHUB_TOKEN = core.getInput('CPD_GITHUB_TOKEN');
+            const DPBF_TOKEN = core.getInput('DPBF_TOKEN');
             const sarif_path = core.getInput('sarif_path');
             const sarif = JSON.parse(fs_1.default.readFileSync(sarif_path, 'utf8'));
             console.log('SARIF read successfully');
             const sourceFilesMap = (0, client_1.scanSourceFiles)(sarif);
             console.log('Source files scanned successfully');
+            console.log(DPBF_TOKEN);
             const result = yield (0, client_1.mockUpdateSarifWithFixes)(sarif, sourceFilesMap);
             console.log('Obtained updated SARIF');
             // do PR comments
-            (0, pr_comment_1.writePRReview)(result);
+            (0, pr_comment_1.writePRReview)(result, CPD_GITHUB_TOKEN);
             fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result));
             core.setOutput('updated_sarif', 'updated_sarif.json');
         }
@@ -224,18 +227,15 @@ function parsePatchesToValidRegions(patches) {
     console.log(validRegions);
     return validRegions;
 }
-function writePRReview(sarif) {
+function writePRReview(sarif, CPD_GITHUB_TOKEN) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!process.env.CPD_GITHUB_TOKEN ||
-            !process.env.GITHUB_REPOSITORY ||
-            !process.env.GITHUB_EVENT_PATH) {
+        if (!process.env.GITHUB_REPOSITORY || !process.env.GITHUB_EVENT_PATH) {
             console.log('Failed to get CPD_GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_PATH');
             console.log(process.env.GITHUB_REPOSITORY);
             console.log(process.env.GITHUB_EVENT_PATH);
-            console.log(process.env.CPD_GITHUB_TOKEN);
             return false;
         }
-        const octokit = new rest_1.Octokit({ auth: process.env.CPD_GITHUB_TOKEN });
+        const octokit = new rest_1.Octokit({ auth: CPD_GITHUB_TOKEN });
         const event = JSON.parse(fs_1.default.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
         const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
         const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
