@@ -33,11 +33,12 @@ export function scanSourceFiles(sarif: SarifFileContents): SourceFilesMap {
 
 export async function updateSarifWithFixes(
   sarif: SarifFileContents,
-  sourceFilesMap: SourceFilesMap
+  sourceFilesMap: SourceFilesMap,
+  DPBF_TOKEN: string
 ): Promise<SarifFileContents> {
   const headers = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${process.env.DPBF_TOKEN}`
+    Authorization: `Bearer ${DPBF_TOKEN}`
   }
 
   const result = await axios.post(

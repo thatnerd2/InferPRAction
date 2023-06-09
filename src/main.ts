@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import fs from 'fs'
-import {scanSourceFiles, mockUpdateSarifWithFixes} from './client'
+import {scanSourceFiles, updateSarifWithFixes} from './client'
 import {writePRReview} from './pr_comment'
 
 async function run(): Promise<void> {
@@ -13,7 +13,7 @@ async function run(): Promise<void> {
     const sourceFilesMap = scanSourceFiles(sarif)
     console.log('Source files scanned successfully')
     console.log(DPBF_TOKEN)
-    const result = await mockUpdateSarifWithFixes(sarif, sourceFilesMap)
+    const result = await updateSarifWithFixes(sarif, sourceFilesMap, DPBF_TOKEN)
     console.log('Obtained updated SARIF')
 
     // do PR comments

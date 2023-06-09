@@ -40,11 +40,11 @@ function scanSourceFiles(sarif) {
     return sourceFilesMap;
 }
 exports.scanSourceFiles = scanSourceFiles;
-function updateSarifWithFixes(sarif, sourceFilesMap) {
+function updateSarifWithFixes(sarif, sourceFilesMap, DPBF_TOKEN) {
     return __awaiter(this, void 0, void 0, function* () {
         const headers = {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.DPBF_TOKEN}`
+            Authorization: `Bearer ${DPBF_TOKEN}`
         };
         const result = yield axios_1.default.post('https://deeppromptbugfix-dev.westus2.inference.ml.azure.com/score', {
             sarif_file_content: sarif,
@@ -157,7 +157,7 @@ function run() {
             const sourceFilesMap = (0, client_1.scanSourceFiles)(sarif);
             console.log('Source files scanned successfully');
             console.log(DPBF_TOKEN);
-            const result = yield (0, client_1.mockUpdateSarifWithFixes)(sarif, sourceFilesMap);
+            const result = yield (0, client_1.updateSarifWithFixes)(sarif, sourceFilesMap, DPBF_TOKEN);
             console.log('Obtained updated SARIF');
             // do PR comments
             (0, pr_comment_1.writePRReview)(result, CPD_GITHUB_TOKEN);
