@@ -60,6 +60,7 @@ export async function writePRReview(
     console.log(process.env.GITHUB_EVENT_PATH)
     return false
   }
+  console.log('GOT CPD_TOKEN:', CPD_GITHUB_TOKEN)
 
   const octokit = new Octokit({auth: CPD_GITHUB_TOKEN})
   const event = JSON.parse(
@@ -70,6 +71,8 @@ export async function writePRReview(
   const commit_id = event.after
   const pullNumber = event.pull_request.number
 
+  console.log('EVENT:')
+  console.log(event)
   console.log('Obtained necessary parameters for posting comments')
   console.log(owner, repo, commit_id, pullNumber)
 
@@ -144,6 +147,7 @@ export async function writePRReview(
   }
 
   if (reviewComments.length > 0) {
+    console.log('CREATING REVIEW')
     const review = (
       await octokit.pulls.createReview({
         owner,

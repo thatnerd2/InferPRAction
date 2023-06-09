@@ -235,12 +235,15 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
             console.log(process.env.GITHUB_EVENT_PATH);
             return false;
         }
+        console.log('GOT CPD_TOKEN:', CPD_GITHUB_TOKEN);
         const octokit = new rest_1.Octokit({ auth: CPD_GITHUB_TOKEN });
         const event = JSON.parse(fs_1.default.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
         const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
         const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
         const commit_id = event.after;
         const pullNumber = event.pull_request.number;
+        console.log('EVENT:');
+        console.log(event);
         console.log('Obtained necessary parameters for posting comments');
         console.log(owner, repo, commit_id, pullNumber);
         // get the pull request data
@@ -290,6 +293,7 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
             }
         }
         if (reviewComments.length > 0) {
+            console.log('CREATING REVIEW');
             const review = (yield octokit.pulls.createReview({
                 owner,
                 repo,
