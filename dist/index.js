@@ -232,6 +232,7 @@ function writePRReview(sarif) {
             console.log('Failed to get CPD_GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_PATH');
             console.log(process.env.GITHUB_REPOSITORY);
             console.log(process.env.GITHUB_EVENT_PATH);
+            console.log(process.env.CPD_GITHUB_TOKEN);
             return false;
         }
         const octokit = new rest_1.Octokit({ auth: process.env.CPD_GITHUB_TOKEN });

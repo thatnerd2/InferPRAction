@@ -61,6 +61,7 @@ export async function writePRReview(
     )
     console.log(process.env.GITHUB_REPOSITORY)
     console.log(process.env.GITHUB_EVENT_PATH)
+    console.log(process.env.CPD_GITHUB_TOKEN)
     return false
   }
 
