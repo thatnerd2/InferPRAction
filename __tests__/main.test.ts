@@ -34,7 +34,11 @@ test('gathers source files map', async () => {
 //       .readFileSync('__tests__/data/CLEAR_TEXT_LOGGING.js')
 //       .toString()
 //   }
-//   const result = await updateSarifWithFixes(sarif, sourceFilesMap)
+//   const result = await updateSarifWithFixes(
+//     sarif,
+//     sourceFilesMap,
+//     process.env.DPBF_TOKEN!
+//   )
 //   expect(result).toBeDefined()
 // }, 100000)
 

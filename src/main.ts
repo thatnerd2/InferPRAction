@@ -15,7 +15,7 @@ async function run(): Promise<void> {
     console.log(DPBF_TOKEN)
     const result = await updateSarifWithFixes(sarif, sourceFilesMap, DPBF_TOKEN)
     console.log('Obtained updated SARIF:')
-    console.log(result)
+    console.log(JSON.stringify(result))
 
     // do PR comments
     writePRReview(result, CPD_GITHUB_TOKEN)

@@ -159,7 +159,7 @@ function run() {
             console.log(DPBF_TOKEN);
             const result = yield (0, client_1.updateSarifWithFixes)(sarif, sourceFilesMap, DPBF_TOKEN);
             console.log('Obtained updated SARIF:');
-            console.log(result);
+            console.log(JSON.stringify(result));
             // do PR comments
             (0, pr_comment_1.writePRReview)(result, CPD_GITHUB_TOKEN);
             fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result));
@@ -236,7 +236,6 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
             console.log(process.env.GITHUB_EVENT_PATH);
             return false;
         }
-        console.log('GOT CPD_TOKEN LEN:', CPD_GITHUB_TOKEN.length);
         const octokit = new rest_1.Octokit({ auth: CPD_GITHUB_TOKEN });
         const event = JSON.parse(fs_1.default.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
         const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
@@ -268,6 +267,7 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
                     ? rawUri.split(`${repo}/`).slice(2).join(`${repo}/`)
                     : rawUri;
                 if (!('fixes' in result)) {
+                    console.log('SKIPPING BECAUSE NO FIXES IN RESULT');
                     continue;
                 }
                 const change_start_line = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['deletedRegion']['startLine'];
