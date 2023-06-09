@@ -158,7 +158,8 @@ function run() {
             console.log('Source files scanned successfully');
             console.log(DPBF_TOKEN);
             const result = yield (0, client_1.updateSarifWithFixes)(sarif, sourceFilesMap, DPBF_TOKEN);
-            console.log('Obtained updated SARIF');
+            console.log('Obtained updated SARIF:');
+            console.log(result);
             // do PR comments
             (0, pr_comment_1.writePRReview)(result, CPD_GITHUB_TOKEN);
             fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result));
