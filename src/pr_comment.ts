@@ -17,23 +17,37 @@ type ValidRegion = {
 }
 
 function parsePatchesToValidRegions(patches: string): ValidRegion[] {
-  console.log(patches)
-  const paths = patches
-    .split('\n')
-    .filter(line => line.startsWith('diff --git a/'))
-    .map(line => line.split(' ')[3].slice(2))
-  const lines = patches
-    .split('\n')
-    .filter(line => line.startsWith('@@'))
-    .map(line => line.split('@@')[1].split(' ')[2].split(','))
-    .map(line => [Math.abs(parseInt(line[0])), Math.abs(parseInt(line[1]))])
-  console.log(patches)
-  console.log(lines)
-  const validRegions = paths.map((path, i) => ({
-    path,
-    start_line: lines[i][0],
-    end_line: lines[i][0] + lines[i][1] - 1
-  }))
+  // TODO: make this a state machine
+  // TODO split this by diff --git a/
+  // for each block, get the path from the first line
+  // then get the first line with @@ and that's the line
+  // and if those don't work return undefined
+  // and remove all the undefineds
+
+  const validRegions = patches
+    .split('diff --git a/')
+    .map(block => {
+      const patchLines = block.split('\n')
+      const path = patchLines[0].split(' ')[1].slice(2)
+      const diffLine = patchLines.find(line => line.startsWith('@@'))
+      if (!diffLine) {
+        return undefined
+      }
+      const lines = diffLine
+        .split('@@')[1]
+        .split(' ')[2]
+        .split(',')
+        .map(line => Math.abs(parseInt(line)))
+      if (lines.length !== 2) {
+        return undefined
+      }
+      return {
+        path,
+        start_line: lines[0],
+        end_line: lines[0] + lines[1] - 1
+      }
+    })
+    .filter(region => region !== undefined) as ValidRegion[]
   console.log('Valid Regions')
   console.log(validRegions)
   return validRegions
