@@ -223,6 +223,8 @@ function parsePatchesToValidRegions(patches) {
         };
     })
         .filter(region => region !== undefined);
+    console.log('Patches:');
+    console.log(patches);
     console.log('Valid Regions');
     console.log(validRegions);
     return validRegions;

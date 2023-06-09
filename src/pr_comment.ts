@@ -48,6 +48,8 @@ function parsePatchesToValidRegions(patches: string): ValidRegion[] {
       }
     })
     .filter(region => region !== undefined) as ValidRegion[]
+  console.log('Patches:')
+  console.log(patches)
   console.log('Valid Regions')
   console.log(validRegions)
   return validRegions
