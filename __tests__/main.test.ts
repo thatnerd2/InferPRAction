@@ -66,9 +66,7 @@ test('writes comment on sample pr', async () => {
   const sarif_file_contents = JSON.parse(
     fs.readFileSync('__tests__/data/test_sarif_with_fix.sarif').toString()
   )
-  expect(
-    await writePRReview(sarif_file_contents, process.env.GITHUB_TOKEN || '')
-  ).toBe(true)
+  expect(await writePRReview(sarif_file_contents)).toBe(true)
 })
 
 // // shows how the runner will run a javascript action with env / stdout protocol

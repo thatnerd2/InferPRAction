@@ -49,19 +49,22 @@ function parsePatchesToValidRegions(patches: string): ValidRegion[] {
 }
 
 export async function writePRReview(
-  sarif: SarifFileContents,
-  github_token: string
+  sarif: SarifFileContents
 ): Promise<boolean> {
-  if (!process.env.GITHUB_REPOSITORY || !process.env.GITHUB_EVENT_PATH) {
+  if (
+    !process.env.CPD_GITHUB_TOKEN ||
+    !process.env.GITHUB_REPOSITORY ||
+    !process.env.GITHUB_EVENT_PATH
+  ) {
     console.log(
-      'Failed to get GITHUB_REPOSITORY, GITHUB_EVENT_PATH or github_token'
+      'Failed to get CPD_GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_PATH'
     )
     console.log(process.env.GITHUB_REPOSITORY)
     console.log(process.env.GITHUB_EVENT_PATH)
     return false
   }
 
-  const octokit = new Octokit({auth: github_token})
+  const octokit = new Octokit({auth: process.env.CPD_GITHUB_TOKEN})
   const event = JSON.parse(
     fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')
   )
@@ -69,6 +72,9 @@ export async function writePRReview(
   const repo = process.env.GITHUB_REPOSITORY.split('/')[1]
   const commit_id = event.after
   const pullNumber = event.pull_request.number
+
+  console.log('Obtained necessary parameters for posting comments')
+  console.log(owner, repo, commit_id, pullNumber)
 
   // get the pull request data
   const patchUrl = (

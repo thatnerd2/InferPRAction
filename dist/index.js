@@ -149,7 +149,6 @@ const pr_comment_1 = __nccwpck_require__(7347);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const github_token = core.getInput('github_token');
             const sarif_path = core.getInput('sarif_path');
             const sarif = JSON.parse(fs_1.default.readFileSync(sarif_path, 'utf8'));
             console.log('SARIF read successfully');
@@ -158,7 +157,7 @@ function run() {
             const result = yield (0, client_1.mockUpdateSarifWithFixes)(sarif, sourceFilesMap);
             console.log('Obtained updated SARIF');
             // do PR comments
-            (0, pr_comment_1.writePRReview)(result, github_token);
+            (0, pr_comment_1.writePRReview)(result);
             fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result));
             core.setOutput('updated_sarif', 'updated_sarif.json');
         }
@@ -225,20 +224,24 @@ function parsePatchesToValidRegions(patches) {
     console.log(validRegions);
     return validRegions;
 }
-function writePRReview(sarif, github_token) {
+function writePRReview(sarif) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!process.env.GITHUB_REPOSITORY || !process.env.GITHUB_EVENT_PATH) {
-            console.log('Failed to get GITHUB_REPOSITORY, GITHUB_EVENT_PATH or github_token');
+        if (!process.env.CPD_GITHUB_TOKEN ||
+            !process.env.GITHUB_REPOSITORY ||
+            !process.env.GITHUB_EVENT_PATH) {
+            console.log('Failed to get CPD_GITHUB_TOKEN, GITHUB_REPOSITORY, GITHUB_EVENT_PATH');
             console.log(process.env.GITHUB_REPOSITORY);
             console.log(process.env.GITHUB_EVENT_PATH);
             return false;
         }
-        const octokit = new rest_1.Octokit({ auth: github_token });
+        const octokit = new rest_1.Octokit({ auth: process.env.CPD_GITHUB_TOKEN });
         const event = JSON.parse(fs_1.default.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
         const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
         const repo = process.env.GITHUB_REPOSITORY.split('/')[1];
         const commit_id = event.after;
         const pullNumber = event.pull_request.number;
+        console.log('Obtained necessary parameters for posting comments');
+        console.log(owner, repo, commit_id, pullNumber);
         // get the pull request data
         const patchUrl = (yield octokit.pulls.get({
             owner,
