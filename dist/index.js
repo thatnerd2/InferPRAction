@@ -193,12 +193,6 @@ exports.writePRReview = void 0;
 const rest_1 = __nccwpck_require__(5375);
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 function parsePatchesToValidRegions(patches) {
-    // TODO: make this a state machine
-    // TODO split this by diff --git a/
-    // for each block, get the path from the first line
-    // then get the first line with @@ and that's the line
-    // and if those don't work return undefined
-    // and remove all the undefineds
     const validRegions = patches
         .split('diff --git a/')
         .map(block => {
@@ -266,11 +260,10 @@ function writePRReview(sarif, github_token) {
                 if (!('fixes' in result)) {
                     continue;
                 }
-                const suggested_change = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['insertedContent'];
                 const change_start_line = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['deletedRegion']['startLine'];
                 const change_end_line = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['deletedRegion']['endLine'];
                 const description = result['fixes'][0]['description']['text'];
-                const commentText = `(Copilot Defender Preview)\n\n${description}\n\n\`\`\`suggestion\n${suggested_change}\n\`\`\``;
+                const commentText = `(Copilot Defender Preview)\n\n${description}`;
                 if (!validRegions.some(region => region.path === uri &&
                     region.start_line <= change_start_line &&
                     region.end_line >= change_end_line)) {
