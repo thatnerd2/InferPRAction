@@ -154,7 +154,9 @@ function run() {
             const sarif = JSON.parse(fs_1.default.readFileSync(sarif_path, 'utf8'));
             console.log('SARIF read successfully');
             const sourceFilesMap = (0, client_1.scanSourceFiles)(sarif);
+            console.log('Source files scanned successfully');
             const result = yield (0, client_1.mockUpdateSarifWithFixes)(sarif, sourceFilesMap);
+            console.log('Obtained updated SARIF');
             // do PR comments
             (0, pr_comment_1.writePRReview)(result, github_token);
             fs_1.default.writeFileSync('updated_sarif.json', JSON.stringify(result));

@@ -10,7 +10,9 @@ async function run(): Promise<void> {
     const sarif = JSON.parse(fs.readFileSync(sarif_path, 'utf8'))
     console.log('SARIF read successfully')
     const sourceFilesMap = scanSourceFiles(sarif)
+    console.log('Source files scanned successfully')
     const result = await mockUpdateSarifWithFixes(sarif, sourceFilesMap)
+    console.log('Obtained updated SARIF')
 
     // do PR comments
     writePRReview(result, github_token)
