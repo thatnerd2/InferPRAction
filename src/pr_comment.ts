@@ -60,7 +60,7 @@ export async function writePRReview(
     console.log(process.env.GITHUB_EVENT_PATH)
     return false
   }
-  console.log('GOT CPD_TOKEN:', CPD_GITHUB_TOKEN)
+  console.log('GOT CPD_TOKEN LEN:', CPD_GITHUB_TOKEN.length)
 
   const octokit = new Octokit({auth: CPD_GITHUB_TOKEN})
   const event = JSON.parse(

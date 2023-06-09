@@ -235,7 +235,7 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
             console.log(process.env.GITHUB_EVENT_PATH);
             return false;
         }
-        console.log('GOT CPD_TOKEN:', CPD_GITHUB_TOKEN);
+        console.log('GOT CPD_TOKEN LEN:', CPD_GITHUB_TOKEN.length);
         const octokit = new rest_1.Octokit({ auth: CPD_GITHUB_TOKEN });
         const event = JSON.parse(fs_1.default.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
         const owner = process.env.GITHUB_REPOSITORY.split('/')[0];
