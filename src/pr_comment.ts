@@ -92,6 +92,7 @@ export async function writePRReview(
   ).data
   const validRegions = parsePatchesToValidRegions(patches)
 
+  const addressedMethods: [string, number, number][] = []
   const reviewComments = []
   for (const run of sarif['runs']) {
     for (const result of run['results']) {
@@ -108,15 +109,28 @@ export async function writePRReview(
       }
 
       const change_start_line =
-        result['fixes'][0]['artifactChanges'][0]['replacements'][0][
+        (result['fixes'][0]['artifactChanges'][0]['replacements'][0][
           'deletedRegion'
-        ]['startLine']
+        ]['startLine'] as number) + 1
       const change_end_line =
-        result['fixes'][0]['artifactChanges'][0]['replacements'][0][
+        (result['fixes'][0]['artifactChanges'][0]['replacements'][0][
           'deletedRegion'
-        ]['endLine']
+        ]['endLine'] as number) + 1
       const description = result['fixes'][0]['description']['text']
       const commentText = `(Copilot Defender Preview)\n\n${description}`
+
+      // Prevent commenting on the same method twice
+      if (
+        addressedMethods.some(
+          method =>
+            method[0] === uri &&
+            method[1] === change_start_line &&
+            method[2] === change_end_line
+        )
+      ) {
+        console.log(`Skipping comment because it's already been addressed`)
+        continue
+      }
 
       if (
         !validRegions.some(
@@ -143,6 +157,7 @@ export async function writePRReview(
       }
 
       reviewComments.push(reviewComment)
+      addressedMethods.push([uri, change_start_line, change_end_line])
     }
   }
 

@@ -258,6 +258,7 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
             }
         })).data;
         const validRegions = parsePatchesToValidRegions(patches);
+        const addressedMethods = [];
         const reviewComments = [];
         for (const run of sarif['runs']) {
             for (const result of run['results']) {
@@ -270,10 +271,17 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
                     console.log('SKIPPING BECAUSE NO FIXES IN RESULT');
                     continue;
                 }
-                const change_start_line = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['deletedRegion']['startLine'];
-                const change_end_line = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['deletedRegion']['endLine'];
+                const change_start_line = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['deletedRegion']['startLine'] + 1;
+                const change_end_line = result['fixes'][0]['artifactChanges'][0]['replacements'][0]['deletedRegion']['endLine'] + 1;
                 const description = result['fixes'][0]['description']['text'];
                 const commentText = `(Copilot Defender Preview)\n\n${description}`;
+                // Prevent commenting on the same method twice
+                if (addressedMethods.some(method => method[0] === uri &&
+                    method[1] === change_start_line &&
+                    method[2] === change_end_line)) {
+                    console.log(`Skipping comment because it's already been addressed`);
+                    continue;
+                }
                 if (!validRegions.some(region => region.path === uri &&
                     region.start_line <= change_start_line &&
                     region.end_line >= change_end_line)) {
@@ -291,6 +299,7 @@ function writePRReview(sarif, CPD_GITHUB_TOKEN) {
                     reviewComment['start_line'] = change_start_line;
                 }
                 reviewComments.push(reviewComment);
+                addressedMethods.push([uri, change_start_line, change_end_line]);
             }
         }
         if (reviewComments.length > 0) {
