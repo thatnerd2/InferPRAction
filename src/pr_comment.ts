@@ -151,6 +151,9 @@ export async function writePRReview(
         line: change_end_line,
         side: 'RIGHT'
       }
+      console.log('Adding comment to reviewComments: ')
+      console.log(uri)
+      console.log(change_start_line, change_end_line)
 
       if (change_end_line > change_start_line) {
         reviewComment['start_line'] = change_start_line
